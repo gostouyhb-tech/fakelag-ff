@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>FakeLag FF</title>
+<style>
+  :root{--or:#FF6B00;--gd:#FFC200;--pn:#111318;--cd:#181c24;--br:rgba(255,107,0,.25);--tx:#e8e4dc;--mt:#6b6e7a;--gn:#00e676}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{width:100%;height:100%;background:transparent;font-family:'Arial Narrow',Arial,sans-serif;overflow:hidden}
+  #panel{position:fixed;top:60px;right:8px;width:200px;background:var(--pn);border:1px solid var(--br);border-radius:10px;overflow:hidden;box-shadow:0 4px 32px rgba(0,0,0,.7)}
+  #panel.mini{width:44px}
+  #panel.mini .body,#panel.mini #htitle,#panel.mini .hsub{display:none}
+  #hdr{background:linear-gradient(90deg,#1a0e00,#1f1500);padding:7px 10px;display:flex;align-items:center;gap:7px;border-bottom:1px solid var(--br);cursor:grab}
+  .hico{width:26px;height:26px;flex-shrink:0;background:var(--or);border-radius:6px;display:flex;align-items:center;justify-content:center}
+  .hico svg{width:15px;height:15px;fill:#fff}
+  #htitle{flex:1;font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--gd);text-transform:uppercase}
+  .hsub{font-size:9px;color:var(--mt)}
+  #mbtn{width:20px;height:20px;flex-shrink:0;background:rgba(255,255,255,.07);border:none;border-radius:4px;color:var(--mt);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .body{padding:10px}
+  .trow{display:flex;align-items:center;justify-content:space-between;background:var(--cd);border:1px solid var(--br);border-radius:8px;padding:8px 10px;margin-bottom:8px}
+  .tlbl{font-size:11px;font-weight:700;color:var(--tx)}
+  .tsub{font-size:9px;color:var(--mt);margin-top:1px}
+  .sw{position:relative;width:36px;height:20px}
+  .sw input{opacity:0;width:0;height:0}
+  .tr2{position:absolute;inset:0;background:#2a2d35;border-radius:10px;transition:.2s;cursor:pointer}
+  .tr2:before{content:'';position:absolute;width:14px;height:14px;left:3px;top:3px;background:#555;border-radius:50%;transition:.2s}
+  input:checked+.tr2{background:rgba(255,107,0,.3);border:1px solid var(--or)}
+  input:checked+.tr2:before{background:var(--or);transform:translateX(16px)}
+  .pg{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:8px}
+  .pb{padding:5px 4px;background:var(--cd);border:1px solid rgba(255,255,255,.07);border-radius:6px;font-size:9px;font-weight:700;color:var(--mt);text-align:center;cursor:pointer;text-transform:uppercase}
+  .pb.on{border-color:var(--or);color:var(--or);background:rgba(255,107,0,.1)}
+  .sb{margin-bottom:7px}
+  .sr{display:flex;justify-content:space-between;margin-bottom:3px}
+  .sl{font-size:9px;color:var(--mt);text-transform:uppercase}
+  .sv{font-size:10px;font-weight:700;color:var(--gd)}
+  input[type=range]{-webkit-appearance:none;width:100%;height:3px;background:#252830;border-radius:2px;outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--or);border:2px solid #0a0a0c;cursor:pointer}
+  .dv{height:1px;background:var(--br);margin:8px 0}
+  .stbar{display:flex;justify-content:space-between;background:var(--cd);border:1px solid var(--br);border-radius:6px;padding:5px 8px}
+  .si{text-align:center}
+  .sv2{font-size:11px;font-weight:700;color:var(--gn)}
+  .sv2.off{color:var(--mt)}
+  .sl2{font-size:8px;color:var(--mt);margin-top:1px}
+  .hico.pl{animation:pu .8s ease-in-out infinite alternate}
+  @keyframes pu{from{box-shadow:0 0 0 0 rgba(255,107,0,.6)}to{box-shadow:0 0 0 5px rgba(255,107,0,0)}}
+</style>
+</head>
+<body>
+<div id="panel">
+  <div id="hdr">
+    <div class="hico" id="hico">
+      <svg viewBox="0 0 24 24"><path d="M22 2H4a2 2 0 0 0-2 2h18V2a2 2 0 0 0-2-2zm2 4H2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6z"/><circle cx="10" cy="13" r="2"/><path d="M19 8l-6 7-4-4 1.4-1.4 2.6 2.6 5.6-5.6z"/></svg>
+    </div>
+    <div>
+      <div id="htitle">FakeLag FF</div>
+      <div class="hsub">UDP Lag Tool</div>
+    </div>
+    <button id="mbtn" onclick="toggleMin()">-</button>
+  </div>
+  <div class="body">
+    <div class="trow">
+      <div>
+        <div class="tlbl" id="tlbl">Lag OFF</div>
+        <div class="tsub" id="tsub">conexao normal</div>
+      </div>
+      <label class="sw"><input type="checkbox" id="tog" onchange="toggleLag(this.checked)"><span class="tr2"></span></label>
+    </div>
+    <div class="pg">
+      <div class="pb on" id="p-slide" onclick="sp(this,120,0,60)">Slide</div>
+      <div class="pb" id="p-rubber" onclick="sp(this,250,5,100)">Rubber</div>
+      <div class="pb" id="p-ghost" onclick="sp(this,400,0,150)">Ghost</div>
+      <div class="pb" id="p-dc" onclick="sp(this,800,20,200)">DC Fake</div>
+    </div>
+    <div class="sb">
+      <div class="sr"><span class="sl">Delay</span><span class="sv" id="vl">120 ms</span></div>
+      <input type="range" id="rng-l" min="10" max="2000" step="10" value="120" oninput="sync()">
+    </div>
+    <div class="sb">
+      <div class="sr"><span class="sl">Packet loss</span><span class="sv" id="vp">0%</span></div>
+      <input type="range" id="rng-p" min="0" max="80" step="1" value="0" oninput="sync()">
+    </div>
+    <div class="sb">
+      <div class="sr"><span class="sl">Jitter</span><span class="sv" id="vj">+/-60 ms</span></div>
+      <input type="range" id="rng-j" min="0" max="300" step="5" value="60" oninput="sync()">
+    </div>
+    <div class="dv"></div>
+    <div class="stbar">
+      <div class="si"><div class="sv2 off" id="s1">-</div><div class="sl2">PING</div></div>
+      <div class="si"><div class="sv2 off" id="s2">-</div><div class="sl2">DROP</div></div>
+      <div class="si"><div class="sv2 off" id="s3">-</div><div class="sl2">TEMPO</div></div>
+    </div>
+  </div>
+</div>
+<script>
+var on=false,ut=0,utmr=null,stmr=null,mini=false;
+function cb(f,a,b,c){try{if(window.FakeLagBridge&&window.FakeLagBridge[f])return window.FakeLagBridge[f](a,b,c)}catch(e){}return null}
+function toggleLag(v){
+  on=v;
+  document.getElementById('tlbl').textContent=v?'Lag ATIVO':'Lag OFF';
+  document.getElementById('tsub').textContent=v?'simulando lag...':'conexao normal';
+  document.getElementById('hico').classList.toggle('pl',v);
+  cb('toggleService',v);
+  if(v){ut=0;startStats()}else stopStats();
+}
+function sp(el,d,l,j){
+  document.querySelectorAll('.pb').forEach(function(p){p.classList.remove('on')});
+  el.classList.add('on');
+  document.getElementById('rng-l').value=d;
+  document.getElementById('rng-p').value=l;
+  document.getElementById('rng-j').value=j;
+  sync();
+}
+function sync(){
+  var d=+document.getElementById('rng-l').value,
+      l=+document.getElementById('rng-p').value,
+      j=+document.getElementById('rng-j').value;
+  document.getElementById('vl').textContent=d+' ms';
+  document.getElementById('vp').textContent=l+'%';
+  document.getElementById('vj').textContent='+/-'+j+' ms';
+  if(on)cb('setConfig',d,l,j);
+}
+function startStats(){
+  utmr=setInterval(function(){
+    ut++;var m=Math.floor(ut/60),s=ut%60;
+    var el=document.getElementById('s3');
+    el.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+    el.classList.remove('off');
+  },1000);
+  stmr=setInterval(function(){
+    var raw=cb('getStatus'),lat,drop;
+    if(raw){try{var d=JSON.parse(raw);lat=d.lat;drop=d.dropped}catch(e){}}
+    if(lat===undefined){
+      var base=+document.getElementById('rng-l').value,jit=+document.getElementById('rng-j').value;
+      lat=base+Math.round((Math.random()-.5)*jit*2);drop=Math.floor(Math.random()*3);
+    }
+    var e1=document.getElementById('s1'),e2=document.getElementById('s2');
+    e1.textContent=lat+'ms';e1.classList.remove('off');
+    e2.textContent=drop;e2.classList.toggle('off',drop===0);
+  },700);
+}
+function stopStats(){
+  clearInterval(utmr);clearInterval(stmr);
+  ['s1','s2','s3'].forEach(function(id){var e=document.getElementById(id);e.textContent='-';e.classList.add('off');});
+}
+function toggleMin(){
+  mini=!mini;
+  document.getElementById('panel').classList.toggle('mini',mini);
+  document.getElementById('mbtn').textContent=mini?'+':'-';
+}
+var pn=document.getElementById('panel'),dr=false,ox=0,oy=0;
+document.getElementById('hdr').addEventListener('touchstart',function(e){
+  if(e.target.closest&&e.target.closest('#mbtn'))return;
+  dr=true;var t=e.touches[0],r=pn.getBoundingClientRect();
+  ox=t.clientX-r.left;oy=t.clientY-r.top;
+},{passive:true});
+document.addEventListener('touchmove',function(e){
+  if(!dr)return;e.preventDefault();
+  var t=e.touches[0],nx=t.clientX-ox,ny=t.clientY-oy;
+  nx=Math.max(0,Math.min(nx,window.innerWidth-pn.offsetWidth));
+  ny=Math.max(0,Math.min(ny,window.innerHeight-pn.offsetHeight));
+  pn.style.right='auto';pn.style.left=nx+'px';pn.style.top=ny+'px';
+},{passive:false});
+document.addEventListener('touchend',function(){dr=false;});
+</script>
+</body>
+</html>
